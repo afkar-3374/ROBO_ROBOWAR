@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Afkar Car Controller</title>
+
+  <!-- MQTT over WebSocket -->
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      margin-top: 20px;
+      color: #38bdf8;
+    }
+
+    .status {
+      margin: 10px;
+      font-size: 18px;
+    }
+
+    .controller {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 15px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    button {
+      width: 100px;
+      height: 60px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      background: #1e293b;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    button:hover {
+      background: #38bdf8;
+      color: black;
+    }
+
+    .speed {
+      margin-top: 30px;
+    }
+
+    input[type=range] {
+      width: 250px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚗 Afkar Smart Car Controller</h1>
+
+  <div class="status">
+    MQTT Status: <span id="status">Connecting...</span>
+  </div>
+
+  <!-- Controller Buttons -->
+  <div class="controller">
+
+    <div></div>
+    <button onclick="sendCmd('F')">Forward</button>
+    <div></div>
+
+    <button onclick="sendCmd('L')">Left</button>
+    <button onclick="sendCmd('S')">Stop</button>
+    <button onclick="sendCmd('R')">Right</button>
+
+    <div></div>
+    <button onclick="sendCmd('B')">Backward</button>
+    <div></div>
+
+  </div>
+
+  <!-- Speed Control -->
+  <div class="speed">
+    <h3>Speed</h3>
+    <input type="range" min="0" max="4" value="2" id="speedSlider">
+    <p>Level: <span id="speedValue">2</span></p>
+  </div>
+
+  <div class="footer">
+    ESP8266 Dual Mode Car Project
+  </div>
+
+
+<script>
+
+/************** SETTINGS **************/
+
+// Public MQTT Broker (WebSocket)
+const broker = "wss://broker.hivemq.com:8884/mqtt";
+
+// Topic (Must match ESP code)
+const topic = "afkar/car/control";
+
+/*************************************/
+
+let client;
+
+const statusText = document.getElementById("status");
+const speedSlider = document.getElementById("speedSlider");
+const speedValue = document.getElementById("speedValue");
+
+// Update speed display
+speedSlider.oninput = () => {
+  speedValue.innerText = speedSlider.value;
+};
+
+// Connect MQTT
+function connectMQTT() {
+
+  client = mqtt.connect(broker);
+
+  client.on("connect", () => {
+    console.log("MQTT Connected");
+    statusText.innerText = "Connected";
+    statusText.style.color = "#22c55e";
+  });
+
+  client.on("reconnect", () => {
+    statusText.innerText = "Reconnecting...";
+    statusText.style.color = "orange";
+  });
+
+  client.on("offline", () => {
+    statusText.innerText = "Offline";
+    statusText.style.color = "red";
+  });
+
+  client.on("error", (err) => {
+    console.error(err);
+    statusText.innerText = "Error";
+    statusText.style.color = "red";
+  });
+}
+
+// Send Command
+function sendCmd(dir) {
+
+  if (!client || !client.connected) {
+    alert("MQTT Not Connected!");
+    return;
+  }
+
+  const speed = speedSlider.value;
+
+  const msg = `${dir},${speed}`;
+
+  client.publish(topic, msg);
+
+  console.log("Sent:", msg);
+}
+
+// Auto connect
+connectMQTT();
+
+</script>
+
+</body>
+</html>
