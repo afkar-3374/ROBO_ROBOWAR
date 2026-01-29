@@ -1,7 +1,7 @@
 # 📌 Electronic Voting Machine using ESP8266 (ESP-NOW)
 
 ## 👤 Project By
-**Name:** Muhammed Afkar M A  
+**Name:** Muhammed Afkar M A  ,Ahban Ahmed , Albert Shibu
 **Course:** Diploma in Electronics Engineering  
 **Institution:** Government Polytechnic College, Kasaragod  
 
