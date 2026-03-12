@@ -118,6 +118,4 @@ Gopika V S\
 \
 \
 Electronics Engineering\
-Government Polytechnic College K
-
-asaragod
+Government Polytechnic College Kasaragod
