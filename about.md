@@ -1,123 +1,120 @@
-# 🚗 Dual Mode Smart Car using ESP8266
+# VoxDrive 🚗🎤
 
-## 📌 Project Title
-**Dual Mode IoT-Based Smart Car using ESP8266**
+### Voice Controlled IoT Robotic Car using MQTT
 
----
+## Overview
 
-## 📖 Introduction
-This project is a smart robotic car controlled using two different communication modes:  
-**ESP-NOW** for local wireless control and **MQTT (Internet of Things)** for remote control through the internet.
+**VoxDrive** is a voice-controlled robotic car that can be operated
+using spoken commands through a web interface. The system uses **speech
+recognition in the browser** to detect commands and sends them to the
+car using the **MQTT protocol** over the internet.
 
-The system allows the user to switch between offline and online control modes using a hardware button.
+The car receives these commands through a microcontroller connected to
+WiFi and performs actions such as moving forward, backward, turning
+left, turning right, stopping, or performing a dance sequence.
 
----
+VoxDrive demonstrates how **voice interfaces, IoT communication, and
+robotics** can be combined to create an intuitive and interactive
+control system.
 
-## 🎯 Objective
-- To design a smart car with dual communication modes  
-- To enable both local and internet-based control  
-- To improve safety using automatic stop (fail-safe) system  
-- To demonstrate IoT and wireless communication concepts
+------------------------------------------------------------------------
 
----
+## Key Features
 
-## ⚙️ Features
-- ✅ ESP-NOW based remote control (No Internet required)
-- ✅ MQTT based web control (Internet control)
-- ✅ Mode switching using push button
-- ✅ LED indication for control mode
-- ✅ Speed control using PWM
-- ✅ Fail-safe auto stop system
-- ✅ Stable long-time operation
+-   🎤 Voice Command Control using Web Speech API
+-   🌐 MQTT Communication for real-time command transmission
+-   🚗 Wireless Car Movement Control
+-   🛑 Emergency Stop Button
+-   💃 Dance Mode (random movement sequence)
+-   📱 Mobile-Friendly Web Interface
+-   ⚡ Real-time Command Execution
 
----
+------------------------------------------------------------------------
 
-## 🧩 Components Used
-- ESP8266 NodeMCU (2 units: Car + Remote)
-- L298N / L293D Motor Driver
-- DC Gear Motors (100 RPM)
-- Castor Wheel
-- Rechargeable Battery
-- Push Buttons (Tactile Switches)
-- LEDs with Resistors
-- Breadboard & Connecting Wires
-- Buck Converter (Optional)
+## Voice Commands
 
----
+  Voice Command   Action
+  --------------- ----------------------------------
+  forward         Move the car forward
+  backward        Move the car backward
+  left            Turn left
+  right           Turn right
+  stop            Stop the car
+  dance           Perform random movement sequence
 
-## 🔌 System Architecture
+------------------------------------------------------------------------
 
-### 1️⃣ ESP-NOW Mode
-- Used for short-range wireless control
-- Does not require internet
-- Fast response
-- Used with physical remote
+## System Architecture
 
-### 2️⃣ MQTT Mode
-- Used for internet-based control
-- Controlled using web page
-- Uses public MQTT broker
-- Works from anywhere
+User Voice\
+↓\
+Web Browser (Speech Recognition)\
+↓\
+Web Page sends MQTT command\
+↓\
+MQTT Broker (HiveMQ)\
+↓\
+WiFi Microcontroller (ESP8266 / NodeMCU)\
+↓\
+Motor Driver\
+↓\
+Robotic Car Movement
 
----
+------------------------------------------------------------------------
 
-## 🔁 Mode Switching
-A push button is used to change modes:
+## Technologies Used
 
-| Button State | Mode     | LED Status |
-|-------------|----------|------------|
-| Not Pressed | ESP-NOW  | OFF        |
-| Pressed     | MQTT     | ON         |
+-   HTML / CSS / JavaScript
+-   Web Speech API
+-   MQTT Protocol
+-   HiveMQ MQTT Broker
+-   ESP8266 / NodeMCU
+-   Motor Driver (L298N / L293D)
+-   WiFi Communication
 
----
+------------------------------------------------------------------------
 
-## 🛡️ Safety System
-A watchdog timer is used in the car.
+## MQTT Configuration
 
-If no command is received within a short time:
-- Motors automatically stop
-- Prevents runaway vehicle
+Topic: car/control
 
----
+Example Message: forward
 
-## 💻 Software Used
-- Arduino IDE
-- ESP8266 Board Package
-- PubSubClient Library
-- ESP-NOW Library
-- HTML + JavaScript (Web Controller)
+------------------------------------------------------------------------
 
----
+## Applications
 
-## 🌐 Web Control
-A web-based controller is used in MQTT mode.
-It provides:
-- Direction buttons
-- Speed control slider
-- Connection status
+-   Voice controlled robotics
+-   IoT automation systems
+-   Educational robotics projects
+-   Human-machine interaction research
+-   Smart mobility demonstrations
 
----
+------------------------------------------------------------------------
 
-## 📊 Applications
-- Robotics learning
-- IoT demonstrations
-- Smart vehicle research
-- College exhibitions
-- Automation projects
+## Future Improvements
 
----
+-   Wake word detection (e.g., "Hey VoxDrive")
+-   AI voice assistant integration
+-   Obstacle detection with ultrasonic sensors
+-   Autonomous navigation mode
+-   Mobile app integration
 
-## 🏁 Conclusion
-This project demonstrates the integration of wireless communication and IoT technology using ESP8266.
+------------------------------------------------------------------------
 
-By supporting both ESP-NOW and MQTT, the system provides reliable and flexible control options.
+## Project Name
 
-The project helps in understanding real-time communication, embedded systems, and robotics.
+**VoxDrive -- A Voice Controlled IoT Robotic Car**
 
----
+------------------------------------------------------------------------
 
-## 👨‍💻 Developed By
-**Muhammed Afkar M A**
+## Author
 
-Diploma in Electronics Engineering  
-Government Polytechnic College, Kasaragod
+Muhammed Afkar M A\
+Ahban Ahmed\
+Vishakh C\
+Gopika V S\
+Electronics Engineering\
+Government Polytechnic College K
+
+asaragod
