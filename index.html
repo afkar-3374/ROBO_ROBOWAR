@@ -1,180 +1,213 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Afkar Car Controller</title>
+<meta charset="UTF-8">
+<title>Voice Car Control</title>
 
-  <!-- MQTT over WebSocket -->
-  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
+<style>
 
-    h1 {
-      margin-top: 20px;
-      color: #38bdf8;
-    }
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+text-align:center;
+padding-top:40px;
+}
 
-    .status {
-      margin: 10px;
-      font-size: 18px;
-    }
+button{
+width:220px;
+height:70px;
+font-size:20px;
+border:none;
+border-radius:12px;
+margin:15px;
+cursor:pointer;
+}
 
-    .controller {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      gap: 15px;
-      justify-content: center;
-      margin-top: 40px;
-    }
+.start{
+background:#22c55e;
+}
 
-    button {
-      width: 100px;
-      height: 60px;
-      font-size: 16px;
-      border: none;
-      border-radius: 12px;
-      background: #1e293b;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-    }
+.stop{
+background:#ef4444;
+}
 
-    button:hover {
-      background: #38bdf8;
-      color: black;
-    }
+#status{
+margin-top:30px;
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+width:80%;
+margin:auto;
+font-size:18px;
+}
 
-    .speed {
-      margin-top: 30px;
-    }
-
-    input[type=range] {
-      width: 250px;
-    }
-
-    .footer {
-      margin-top: 40px;
-      font-size: 14px;
-      color: #94a3b8;
-    }
-  </style>
+</style>
 </head>
+
 <body>
 
-  <h1>🚗 Afkar Smart Car Controller</h1>
+<h1>🚗 Voice Controlled Car</h1>
 
-  <div class="status">
-    MQTT Status: <span id="status">Connecting...</span>
-  </div>
+<button class="start" onclick="startListening()">🎤 Start Command</button>
+<button class="stop" onclick="stopListening()">🛑 Stop Command</button>
 
-  <!-- Controller Buttons -->
-  <div class="controller">
-
-    <div></div>
-    <button onclick="sendCmd('F')">Forward</button>
-    <div></div>
-
-    <button onclick="sendCmd('L')">Left</button>
-    <button onclick="sendCmd('S')">Stop</button>
-    <button onclick="sendCmd('R')">Right</button>
-
-    <div></div>
-    <button onclick="sendCmd('B')">Backward</button>
-    <div></div>
-
-  </div>
-
-  <!-- Speed Control -->
-  <div class="speed">
-    <h3>Speed</h3>
-    <input type="range" min="0" max="4" value="2" id="speedSlider">
-    <p>Level: <span id="speedValue">2</span></p>
-  </div>
-
-  <div class="footer">
-    ESP8266 Dual Mode Car Project
-  </div>
-
+<div id="status">Press START to give command</div>
 
 <script>
 
-/************** SETTINGS **************/
+/* MQTT CONNECTION */
 
-// Public MQTT Broker (WebSocket)
-const broker = "wss://broker.hivemq.com:8884/mqtt";
+const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
 
-// Topic (Must match ESP code)
-const topic = "afkar/car/control";
+client.on("connect",function(){
+console.log("MQTT Connected");
+});
 
-/*************************************/
+/* SEND MQTT */
 
-let client;
+function sendCommand(cmd){
 
-const statusText = document.getElementById("status");
-const speedSlider = document.getElementById("speedSlider");
-const speedValue = document.getElementById("speedValue");
+console.log("Sending:",cmd);
 
-// Update speed display
-speedSlider.oninput = () => {
-  speedValue.innerText = speedSlider.value;
+client.publish("car/control",cmd);
+
+}
+
+/* VOICE RECOGNITION */
+
+const SpeechRecognition =
+window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new SpeechRecognition();
+
+recognition.lang="en-US";
+recognition.continuous=true;
+recognition.interimResults=false;
+
+/* START LISTENING */
+
+function startListening(){
+
+document.getElementById("status").innerText="🎤 Listening started...";
+
+recognition.start();
+
+}
+
+/* STOP LISTENING */
+
+function stopListening(){
+
+recognition.stop();
+
+sendCommand("stop");
+
+document.getElementById("status").innerText="🛑 Listening stopped";
+
+}
+
+/* EVENTS */
+
+recognition.onstart=function(){
+
+document.getElementById("status").innerText="🎤 Listening... Speak command";
+
 };
 
-// Connect MQTT
-function connectMQTT() {
+recognition.onspeechstart=function(){
 
-  client = mqtt.connect(broker);
+document.getElementById("status").innerText="🗣 Speech detected";
 
-  client.on("connect", () => {
-    console.log("MQTT Connected");
-    statusText.innerText = "Connected";
-    statusText.style.color = "#22c55e";
-  });
+};
 
-  client.on("reconnect", () => {
-    statusText.innerText = "Reconnecting...";
-    statusText.style.color = "orange";
-  });
+recognition.onresult=function(event){
 
-  client.on("offline", () => {
-    statusText.innerText = "Offline";
-    statusText.style.color = "red";
-  });
+let text=event.results[event.results.length-1][0].transcript.toLowerCase();
 
-  client.on("error", (err) => {
-    console.error(err);
-    statusText.innerText = "Error";
-    statusText.style.color = "red";
-  });
+document.getElementById("status").innerText="✅ Heard: "+text;
+
+processCommand(text);
+
+};
+
+recognition.onerror=function(event){
+
+document.getElementById("status").innerText="❌ Error: "+event.error;
+
+};
+
+/* COMMAND PROCESSING */
+
+function processCommand(cmd){
+
+if(cmd.includes("forward")){
+
+sendCommand("forward");
+
 }
 
-// Send Command
-function sendCmd(dir) {
+else if(cmd.includes("back")){
 
-  if (!client || !client.connected) {
-    alert("MQTT Not Connected!");
-    return;
-  }
+sendCommand("backward");
 
-  const speed = speedSlider.value;
-
-  const msg = `${dir},${speed}`;
-
-  client.publish(topic, msg);
-
-  console.log("Sent:", msg);
 }
 
-// Auto connect
-connectMQTT();
+else if(cmd.includes("left")){
+
+sendCommand("left");
+
+}
+
+else if(cmd.includes("right")){
+
+sendCommand("right");
+
+}
+
+else if(cmd.includes("stop")){
+
+sendCommand("stop");
+
+}
+
+else if(cmd.includes("dance")){
+
+startDance();
+
+}
+
+}
+
+/* DANCE MODE */
+
+function startDance(){
+
+document.getElementById("status").innerText="💃 Dance mode";
+
+const moves=["forward","backward","left","right"];
+
+let dance=setInterval(()=>{
+
+let move=moves[Math.floor(Math.random()*moves.length)];
+
+sendCommand(move);
+
+},700);
+
+setTimeout(()=>{
+
+clearInterval(dance);
+
+sendCommand("stop");
+
+document.getElementById("status").innerText="💃 Dance finished";
+
+},8000);
+
+}
 
 </script>
 
